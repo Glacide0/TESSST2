@@ -1,90 +1,90 @@
-# Mushroom Classifier
+# Классификатор грибов
 
-A machine learning project for mushroom classification using PyTorch Lightning and MLOps best practices.
+Проект машинного обучения для классификации грибов с использованием PyTorch Lightning и лучших практик MLOps.
 
-## Project Structure
+## Структура проекта
 
 ```
 .
-├── configs/               # Configuration files using Hydra
-│   ├── preprocessing.yaml # Data preprocessing configuration
-│   ├── model.yaml        # Model architecture configuration
-│   └── training.yaml     # Training parameters
-├── data/                 # Data directory (versioned with DVC)
-│   ├── raw/              # Raw data files
-│   └── processed/        # Processed data files
+├── configs/               # Конфигурационные файлы с использованием Hydra
+│   ├── preprocessing.yaml # Конфигурация предобработки данных
+│   ├── model.yaml        # Конфигурация архитектуры модели
+│   └── training.yaml     # Параметры обучения
+├── data/                 # Директория с данными (версионируется с помощью DVC)
+│   ├── raw/              # Исходные данные
+│   └── processed/        # Обработанные данные
 │       ├── train/
 │       ├── val/
 │       └── test/
-├── models/               # Saved models
-│   ├── checkpoints/      # Training checkpoints
-│   └── exported/         # Exported models (ONNX, etc.)
-├── logs/                 # Logs directory
-│   ├── mlflow/           # MLflow logs
-│   └── tensorboard/      # TensorBoard logs
-├── mushroom_classifier/  # Main package
+├── models/               # Сохраненные модели
+│   ├── checkpoints/      # Контрольные точки обучения
+│   └── exported/         # Экспортированные модели (ONNX и т.д.)
+├── logs/                 # Директория логов
+│   ├── mlflow/           # Логи MLflow
+│   └── tensorboard/      # Логи TensorBoard
+├── mushroom_classifier/  # Основной пакет
 │   ├── __init__.py
-│   ├── data.py           # Data loading and processing
-│   ├── model.py          # Model definition
-│   ├── train.py          # Training code
-│   ├── infer.py          # Inference code
-│   └── utils.py          # Utility functions
-├── scripts/              # Utility scripts
-│   ├── prepare_data.py   # Data preparation script
-│   ├── export_model.py   # Model export script
-│   └── run_server.py     # Inference server script
-├── .dvc/                 # DVC configuration
+│   ├── data.py           # Загрузка и обработка данных
+│   ├── model.py          # Определение модели
+│   ├── train.py          # Код для обучения
+│   ├── infer.py          # Код для вывода
+│   └── utils.py          # Вспомогательные функции
+├── scripts/              # Вспомогательные скрипты
+│   ├── prepare_data.py   # Скрипт подготовки данных
+│   ├── export_model.py   # Скрипт экспорта модели
+│   └── run_server.py     # Скрипт запуска сервера вывода
+├── .dvc/                 # Конфигурация DVC
 ├── .gitignore
-├── pyproject.toml        # Project dependencies
-├── .pre-commit-config.yaml # Pre-commit hooks
-└── setup.py             # Package setup script
+├── pyproject.toml        # Зависимости проекта
+├── .pre-commit-config.yaml # Хуки pre-commit
+└── setup.py             # Скрипт настройки пакета
 ```
 
-## Setup
+## Установка
 
 ```bash
-# Clone the repository
+# Клонирование репозитория
 git clone https://github.com/username/mushroom-classifier.git
 cd mushroom-classifier
 
-# Create a virtual environment
+# Создание виртуального окружения
 python -m venv .venv
-source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+source .venv/bin/activate  # В Windows: .venv\Scripts\activate
 
-# Install dependencies
+# Установка зависимостей
 pip install -e .
 
-# Pull data using DVC
+# Загрузка данных с помощью DVC
 dvc pull
 ```
 
-## Training
+## Обучение
 
 ```bash
 python -m mushroom_classifier.train
 ```
 
-Or with custom configuration:
+Или с пользовательской конфигурацией:
 
 ```bash
 python -m mushroom_classifier.train --config-name=training.yaml +model.learning_rate=0.001
 ```
 
-## Inference
+## Вывод
 
 ```bash
 python -m mushroom_classifier.infer --image-path=path/to/image.jpg --model-path=models/exported/model.onnx
 ```
 
-## MLOps Features
+## Функции MLOps
 
-- **Data Versioning**: Uses DVC to version data and models
-- **Experiment Tracking**: MLflow integration for tracking experiments
-- **Model Export**: Exports to ONNX/TensorRT for production deployment
-- **CI/CD**: GitHub Actions for automation (linting, testing, building)
-- **Containerization**: Docker support for reproducible environments
-- **Code Quality**: Pre-commit hooks for linting and formatting
+- **Версионирование данных**: Использование DVC для версионирования данных и моделей
+- **Отслеживание экспериментов**: Интеграция с MLflow для отслеживания экспериментов
+- **Экспорт моделей**: Экспорт в ONNX/TensorRT для развертывания в продакшене
+- **CI/CD**: GitHub Actions для автоматизации (линтинг, тестирование, сборка)
+- **Контейнеризация**: Поддержка Docker для воспроизводимого окружения
+- **Качество кода**: Хуки pre-commit для линтинга и форматирования
 
-## License
+## Лицензия
 
 MIT
