@@ -1,160 +1,160 @@
-# Mushroom Classifier
+# Классификатор грибов
 
-A machine learning classifier for identifying edible vs poisonous mushrooms from tabular data.
+Проект машинного обучения для идентификации съедобных и ядовитых грибов на основе табличных данных.
 
-## Project Description
+## Описание проекта
 
-The goal of this project is to build a classifier that can identify whether mushrooms are edible or poisonous based on their features. The model is trained on the UCI Mushroom dataset, which contains categorical attributes describing various mushroom characteristics.
+Цель этого проекта — создание классификатора, способного определять съедобность или ядовитость грибов на основе их характеристик. Модель обучается на наборе данных UCI Mushroom, содержащем категориальные признаки, описывающие различные характеристики грибов.
 
-This project uses:
-- PyTorch and PyTorch Lightning for model training
-- Hydra for configuration management
-- DVC for data versioning and management
-- MLflow for experiment tracking
-- ONNX and TensorRT for model optimization
-- Triton Inference Server for model deployment
+Проект использует:
+- PyTorch и PyTorch Lightning для обучения модели
+- Hydra для управления конфигурацией
+- DVC для версионирования и управления данными
+- MLflow для отслеживания экспериментов
+- ONNX и TensorRT для оптимизации модели
+- Triton Inference Server для развертывания модели
 
-## Setup
+## Настройка
 
-### Prerequisites
+### Предварительные требования
 
 - Python 3.8+
 
-### Installation
+### Установка
 
-1. Clone the repository:
+1. Клонировать репозиторий:
 ```bash
 git clone https://github.com/yourusername/mushroom-classifier.git
 cd mushroom-classifier
 ```
 
-2. Create and activate a virtual environment:
+2. Создать и активировать виртуальное окружение:
 ```bash
-# Using venv
+# Использование venv
 python -m venv .venv
-source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+source .venv/bin/activate  # На Windows: .venv\Scripts\activate
 
-# OR using conda
+# ИЛИ использование conda
 conda create -n mushroom-classifier python=3.8
 conda activate mushroom-classifier
 ```
 
-3. Install the package and dependencies using Poetry:
+3. Установить пакет и зависимости с помощью Poetry:
 ```bash
-# Install Poetry if you don't have it
+# Установить Poetry, если его нет
 pip install poetry
 
-# Install project dependencies
+# Установить зависимости проекта
 poetry install
 ```
 
-4. Set up pre-commit hooks:
+4. Настроить pre-commit хуки:
 ```bash
 pre-commit install
 ```
 
-## Data Management with DVC
+## Управление данными с DVC
 
-The project uses DVC to manage and version the dataset. The data is stored in Google Drive by default.
+Проект использует DVC для управления и версионирования набора данных. Данные по умолчанию хранятся в Google Drive.
 
-1. Pull the data from the configured remote:
+1. Загрузить данные из настроенного удаленного хранилища:
 ```bash
 dvc pull
 ```
 
-2. If you want to use a different storage provider, you can update the DVC configuration:
+2. Если вы хотите использовать другое хранилище, вы можете обновить конфигурацию DVC:
 ```bash
-# For Google Drive
+# Для Google Drive
 dvc remote add -d storage gdrive://your-gdrive-folder-id
 dvc remote modify storage gdrive_acknowledge_abuse true
 
-# For S3
+# Для S3
 dvc remote add -d s3storage s3://your-bucket-name
 dvc remote modify s3storage endpointurl https://your-endpoint
 dvc remote modify s3storage access_key_id your-access-key
 dvc remote modify s3storage secret_access_key your-secret-key
 ```
 
-## Training
+## Обучение
 
-Train the model using the default configuration:
+Обучение модели с использованием конфигурации по умолчанию:
 
 ```bash
 python -m mushroom_classifier.train
 ```
 
-Or with custom parameters:
+Или с пользовательскими параметрами:
 
 ```bash
 python -m mushroom_classifier.train trainer.max_epochs=50 model.hidden_sizes=[256,128,64]
 ```
 
-The training metrics will be logged to TensorBoard. You can view them with:
+Метрики обучения будут записываться в TensorBoard. Вы можете просмотреть их с помощью:
 
 ```bash
 tensorboard --logdir logs/tensorboard
 ```
 
-## Experiment Tracking with MLflow
+## Отслеживание экспериментов с MLflow
 
-Start the MLflow server to track experiments:
+Запустите сервер MLflow для отслеживания экспериментов:
 
 ```bash
 python scripts/start_mlflow_server.py --port 8080
 ```
 
-Then open your browser and navigate to `http://127.0.0.1:8080` to view the MLflow UI.
+Затем откройте браузер и перейдите по адресу `http://127.0.0.1:8080`, чтобы просмотреть интерфейс MLflow.
 
-Training metrics, parameters, and artifacts will be automatically logged to MLflow when you run the training script.
+Метрики обучения, параметры и артефакты будут автоматически записываться в MLflow при запуске скрипта обучения.
 
-## Model Optimization
+## Оптимизация модели
 
-### Convert to ONNX
+### Преобразование в ONNX
 
-Convert the trained PyTorch model to ONNX format:
+Конвертация обученной модели PyTorch в формат ONNX:
 
 ```bash
 python scripts/convert_to_onnx.py --model_path models/checkpoints/best_model.ckpt --output_path models/exported/model.onnx
 ```
 
-### Convert to TensorRT
+### Преобразование в TensorRT
 
-Convert the ONNX model to TensorRT for faster inference:
+Конвертация модели ONNX в TensorRT для более быстрого вывода:
 
 ```bash
 python scripts/convert_to_tensorrt.py --onnx_path models/exported/model.onnx --tensorrt_path models/exported/model.engine --precision fp16
 ```
 
-## Inference
+## Инференс
 
-Run inference using the trained model:
+Запуск инференса с использованием обученной модели:
 
 ```bash
 python -m mushroom_classifier.infer --input path/to/mushroom/features.csv --output predictions.json
 ```
 
-To use the ONNX model for inference:
+Для использования модели ONNX для инференса:
 
 ```bash
 python -m mushroom_classifier.infer model.use_onnx=true --input path/to/mushroom/features.csv
 ```
 
-## Deployment with Triton Inference Server
+## Развертывание с Triton Inference Server
 
-Set up and start the Triton Inference Server with your model:
+Настройка и запуск Triton Inference Server с вашей моделью:
 
 ```bash
 python scripts/setup_triton_server.py --model_path models/exported/model.onnx --model_format onnx
 ```
 
-This will:
-1. Prepare the model repository with the correct structure
-2. Configure the model for Triton
-3. Start the Triton server
+Это действие:
+1. Подготовит репозиторий модели с правильной структурой
+2. Настроит модель для Triton
+3. Запустит сервер Triton
 
-Once the server is running, you can send inference requests to `http://localhost:8000/v2/models/mushroom_classifier/infer` with an appropriate JSON payload.
+После запуска сервера вы можете отправлять запросы на инференс по адресу `http://localhost:8000/v2/models/mushroom_classifier/infer` с соответствующей полезной нагрузкой JSON.
 
-Example inference request:
+Пример запроса на инференс:
 
 ```bash
 curl -X POST http://localhost:8000/v2/models/mushroom_classifier/infer \
@@ -171,83 +171,83 @@ curl -X POST http://localhost:8000/v2/models/mushroom_classifier/infer \
   }'
 ```
 
-## How We Will Check Your Work (Verification Steps)
+## Как мы проверим вашу работу (шаги верификации)
 
-1. **Setup and Installation**:
-   - Clone the repository
-   - Create a virtual environment
-   - Run `poetry install`
-   - Run `pre-commit install`
+1. **Настройка и установка**:
+   - Клонирование репозитория
+   - Создание виртуального окружения
+   - Запуск `poetry install`
+   - Запуск `pre-commit install`
 
-2. **Data Management**:
-   - Run `dvc pull` to fetch the dataset
-   - Verify data structure in the `data/` directory
+2. **Управление данными**:
+   - Запуск `dvc pull` для получения набора данных
+   - Проверка структуры данных в директории `data/`
 
-3. **Training**:
-   - Run `python -m mushroom_classifier.train`
-   - Check TensorBoard logs in `logs/tensorboard/`
-   - Check MLflow experiments at `http://127.0.0.1:8080`
+3. **Обучение**:
+   - Запуск `python -m mushroom_classifier.train`
+   - Проверка логов TensorBoard в `logs/tensorboard/`
+   - Проверка экспериментов MLflow по адресу `http://127.0.0.1:8080`
 
-4. **Model Export**:
-   - Verify ONNX model was created in `models/exported/`
-   - Run TensorRT conversion
+4. **Экспорт модели**:
+   - Проверка создания модели ONNX в `models/exported/`
+   - Запуск конвертации в TensorRT
 
-5. **Inference**:
-   - Run inference on test data
-   - Start Triton server and test inference API
+5. **Инференс**:
+   - Запуск инференса на тестовых данных
+   - Запуск сервера Triton и тестирование API инференса
 
-6. **Code Quality**:
-   - Run `pre-commit run -a` to verify code quality
+6. **Качество кода**:
+   - Запуск `pre-commit run -a` для проверки качества кода
 
-## Project Structure
+## Структура проекта
 
 ```
 mushroom_classifier/
-├── configs/                # Hydra configuration files
-│   ├── config.yaml         # Main configuration
-│   ├── model.yaml          # Model configuration
-│   ├── preprocessing.yaml  # Data preprocessing configuration
-│   └── training.yaml       # Training configuration
-├── data/                   # Data directory
-│   ├── raw/                # Raw data files
-│   └── processed/          # Processed data files
-├── logs/                   # Log files
-│   ├── mlflow/             # MLflow logs
-│   └── tensorboard/        # TensorBoard logs
-├── models/                 # Model files
-│   ├── checkpoints/        # Model checkpoints
-│   └── exported/           # Exported models (ONNX, TensorRT)
-├── mushroom_classifier/    # Main package
-│   ├── __init__.py         # Package initialization
-│   ├── data.py             # Data loading and preprocessing
-│   ├── model.py            # Model definition
-│   ├── train.py            # Training script
-│   ├── infer.py            # Inference script
-│   └── utils.py            # Utility functions
-├── scripts/                # Utility scripts
-│   ├── convert_to_onnx.py         # Convert model to ONNX
-│   ├── convert_to_tensorrt.py     # Convert ONNX to TensorRT
-│   ├── setup_triton_server.py     # Setup Triton server
-│   └── start_mlflow_server.py     # Start MLflow server
-├── .dvc/                   # DVC configuration
-├── .pre-commit-config.yaml # Pre-commit hooks configuration
-├── pyproject.toml          # Poetry configuration
-├── prepare_data.py         # Data preparation script
-└── README.md               # Project documentation
+├── configs/               # Файлы конфигурации Hydra
+│   ├── config.yaml        # Основная конфигурация
+│   ├── model.yaml         # Конфигурация модели
+│   ├── preprocessing.yaml # Конфигурация предобработки данных
+│   └── training.yaml      # Конфигурация обучения
+├── data/                  # Директория данных
+│   ├── raw/               # Исходные файлы данных
+│   └── processed/         # Обработанные файлы данных
+├── logs/                  # Файлы логов
+│   ├── mlflow/            # Логи MLflow
+│   └── tensorboard/       # Логи TensorBoard
+├── models/                # Файлы моделей
+│   ├── checkpoints/       # Контрольные точки модели
+│   └── exported/          # Экспортированные модели (ONNX, TensorRT)
+├── mushroom_classifier/   # Основной пакет
+│   ├── __init__.py        # Инициализация пакета
+│   ├── data.py            # Загрузка и предобработка данных
+│   ├── model.py           # Определение модели
+│   ├── train.py           # Скрипт обучения
+│   ├── infer.py           # Скрипт инференса
+│   └── utils.py           # Вспомогательные функции
+├── scripts/               # Вспомогательные скрипты
+│   ├── convert_to_onnx.py         # Конвертация модели в ONNX
+│   ├── convert_to_tensorrt.py     # Конвертация ONNX в TensorRT
+│   ├── setup_triton_server.py     # Настройка сервера Triton
+│   └── start_mlflow_server.py     # Запуск сервера MLflow
+├── .dvc/                  # Конфигурация DVC
+├── .pre-commit-config.yaml # Конфигурация хуков pre-commit
+├── pyproject.toml         # Конфигурация Poetry
+├── prepare_data.py        # Скрипт подготовки данных
+└── README.md              # Документация проекта
 ```
 
-## Dataset Information
+## Информация о наборе данных
 
-The UCI Mushroom dataset contains features of 8,124 mushroom samples, each classified as either edible or poisonous. Features include:
+Набор данных UCI Mushroom содержит характеристики 8,124 образцов грибов, каждый из которых классифицирован как съедобный или ядовитый. Характеристики включают:
 
-- Cap shape, surface, color
-- Bruises presence
-- Odor
-- Gill attachment, spacing, size, color
-- Stalk shape and root
-- Veil type and color
-- Ring number and type
-- Spore print color
-- Population and habitat
+- Форма, поверхность и цвет шляпки
+- Наличие синяков
+- Запах
+- Прикрепление, расстановка, размер и цвет жабр
+- Форма и корень ножки
+- Тип и цвет вуали
+- Количество и тип колец
+- Цвет споровой массы
+- Популяция и среда обитания
 
-For more information, see the [UCI Machine Learning Repository](https://archive.ics.uci.edu/ml/datasets/mushroom). 
+Для получения дополнительной информации см. [Репозиторий машинного обучения UCI](https://archive.ics.uci.edu/ml/datasets/mushroom).
