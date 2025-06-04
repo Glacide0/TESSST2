@@ -2,9 +2,7 @@
 """Script to prepare and preprocess data for mushroom classification."""
 
 import argparse
-import json
 import os
-import shutil
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 
@@ -18,7 +16,9 @@ from mushroom_classifier.utils import generate_class_mapping, save_class_mapping
 
 def parse_args():
     """Parse command line arguments."""
-    parser = argparse.ArgumentParser(description="Prepare data for mushroom classification.")
+    parser = argparse.ArgumentParser(
+        description="Prepare data for mushroom classification."
+    )
     parser.add_argument(
         "--raw-data", type=str, required=True, help="Path to raw data directory"
     )
@@ -34,9 +34,15 @@ def parse_args():
     parser.add_argument(
         "--test-ratio", type=float, default=0.15, help="Ratio of test data"
     )
-    parser.add_argument("--seed", type=int, default=42, help="Random seed for reproducibility")
     parser.add_argument(
-        "--resize", type=int, nargs=2, default=[224, 224], help="Size to resize images to (H W)"
+        "--seed", type=int, default=42, help="Random seed for reproducibility"
+    )
+    parser.add_argument(
+        "--resize",
+        type=int,
+        nargs=2,
+        default=[224, 224],
+        help="Size to resize images to (H W)",
     )
     return parser.parse_args()
 
@@ -91,10 +97,23 @@ def split_and_copy_data(
     test_dir: Path,
     train_ratio: float,
     val_ratio: float,
+    test_ratio: float,
     resize: Optional[Tuple[int, int]] = None,
     seed: int = 42,
 ):
-    """Split data into train/val/test sets and copy to respective directories."""
+    """Split data into train/val/test sets and copy to respective directories.
+
+    Args:
+        image_paths: Mapping of class name to list of image paths.
+        train_dir: Directory to store training images.
+        val_dir: Directory to store validation images.
+        test_dir: Directory to store test images.
+        train_ratio: Proportion of images used for training.
+        val_ratio: Proportion of images used for validation.
+        test_ratio: Proportion of images used for testing.
+        resize: Optional size ``(H, W)`` to resize images.
+        seed: Random seed for reproducibility.
+    """
     np.random.seed(seed)
 
     for class_name, paths in image_paths.items():
@@ -129,7 +148,9 @@ def split_and_copy_data(
         process_and_copy_images(test_paths, test_class_dir, resize)
 
 
-def process_and_copy_images(paths: List[Path], output_dir: Path, resize: Optional[Tuple[int, int]]):
+def process_and_copy_images(
+    paths: List[Path], output_dir: Path, resize: Optional[Tuple[int, int]]
+):
     """Process and copy images to the target directory."""
     for idx, path in enumerate(tqdm(paths, desc="Processing")):
         try:
@@ -176,6 +197,7 @@ def main():
         test_dir,
         args.train_ratio,
         args.val_ratio,
+        args.test_ratio,
         resize=resize,
         seed=args.seed,
     )
